@@ -25,11 +25,41 @@
  *                  original function, the resolver function should provide the memoization key.
  * @param timeout   timeout for cached values in milliseconds
  */
+
+// cache for momized functions, using array with key-value
+let cache = [];
+
 function memoize(func, resolver, timeout) {
-    // TODO implement the memoize function
-    return func;
+  // TODO implement timeout
+  // TODO resolver as optional argument
+
+  //   console.log("arguments outside 1:" + arguments[0]);
+  //   console.log("arguments outside 2:" + arguments[1]);
+  //   console.log("arguments outside 3:" + arguments[2]);
+
+  // initialize key
+  let key;
+
+  memoized = function () {
+    // console.log("arguments inside 1:" + arguments[0]);
+    // console.log("arguments inside 2:" + arguments[1]);
+
+    // (LEARN MORE what exactly is happening when you call function.prototype.apply + "this")
+
+    key = resolver.apply(this, arguments);
+    console.log("key from resolver: " + key);
+
+    if (typeof cache[key] == "undefined") {
+      cache[key] = func.apply(this.arguments);
+    }
+
+    console.log("value of the key: " + cache[key]);
+
+    return cache[key];
+  };
+  return memoized;
 }
 
 module.exports = {
-    memoize,
+  memoize,
 };
