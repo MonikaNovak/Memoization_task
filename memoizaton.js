@@ -33,21 +33,29 @@ function memoize(func, resolver, timeout) {
   // TODO implement timeout
   // TODO resolver as optional argument
 
-  //   console.log("arguments outside 1:" + arguments[0]);
-  //   console.log("arguments outside 2:" + arguments[1]);
-  //   console.log("arguments outside 3:" + arguments[2]);
-
   // initialize key
   let key;
+  let testKey = resolver.apply(this, arguments);
+  console.log("test key: " + testKey);
 
+  // memoized function in which we have access to the object calling passed in function to access its arguments
   memoized = function () {
-    // console.log("arguments inside 1:" + arguments[0]);
-    // console.log("arguments inside 2:" + arguments[1]);
+    // (LEARN MORE what exactly is happening when you call function.prototype.apply() + "this")
+    // TODO defining what types keys should have
 
-    // (LEARN MORE what exactly is happening when you call function.prototype.apply + "this")
+    if (resolver) {
+      key = resolver.apply(this, arguments);
+      console.log("key from resolver: " + key);
+    } else {
+      // TODO use hashcode to create a key from args from passed func
+      // check how is it if different function gets passed with same arguments
+      key = null;
+    }
 
-    key = resolver.apply(this, arguments);
-    console.log("key from resolver: " + key);
+    setTimeout(() => {
+      console.log("deleting " + cache[key]);
+      delete cache[key];
+    }, timeout);
 
     if (typeof cache[key] == "undefined") {
       cache[key] = func.apply(this.arguments);
