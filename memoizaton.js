@@ -49,15 +49,32 @@ function memoize(func, resolver, timeout) {
       resolverKey = resolver.apply(this, arguments);
       // key = resolver.apply(this, arguments);
       console.log("key from resolver: " + resolverKey);
+      // console.log("resolverKey typeof: " + typeof resolverKey);
       if (typeof resolverKey === "string") {
         key = resolverKey;
       } else {
-        // for now just uses input as cache key
-        key = resolverKey;
+        // TODO other types, or multiple parameters, for now only number
+
+        // using hashCode as in Java
+        // source: https://werxltd.com/wp/2010/05/13/javascript-implementation-of-javas-string-hashcode-method/
+
+        String.prototype.hashCode = function () {
+          var hash = 0;
+          if (this.length == 0) return hash;
+          for (i = 0; i < this.length; i++) {
+            char = this.charCodeAt(i);
+            hash = (hash << 5) - hash + char;
+            hash = hash & hash; // Convert to 32bit integer
+          }
+          return hash;
+        };
+
+        let resolverKeyToString = resolverKey.toString();
+        key = resolverKeyToString.hashCode();
+        console.log("hashed key: " + hashedKey);
       }
     } else {
       // TODO use hashcode to create a key from args from passed func
-      // check how is it if different function gets passed with same arguments
       for (let i = 0; i < arguments.length; i++) {
         console.log("arguments " + i + ": " + arguments[i]);
       }
