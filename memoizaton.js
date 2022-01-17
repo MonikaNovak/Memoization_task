@@ -26,72 +26,60 @@
  * @param timeout   timeout for cached values in milliseconds
  */
 
-// cache for momized functions, using array with key-value
+// cache for memoized functions, using array with key-value
 let cache = [];
 
-function memoize(func, resolver, timeout) {
-  // TODO resolver as optional argument
-
+function memoize(func, timeout, resolver) {
   // initialize key
   let key;
 
   // memoized function in which we have access to the object calling passed in function to access its arguments
   // memoize() returns a new function which wraps a caching mechanism around “func”
   memoized = function () {
-    // (LEARN MORE what exactly is happening when you call function.prototype.apply() + "this")
     // TODO defining what types keys should have
 
-    // console.log("arguments1: " + args[0]);
-    // console.log("arguments2: " + args[1]);
-    // console.log("arguments3: " + args[2]);
+    // using hashCode as in Java
+    // source: https://werxltd.com/wp/2010/05/13/javascript-implementation-of-javas-string-hashcode-method/
+
+    String.prototype.hashCode = function () {
+      var hash = 0;
+      if (this.length == 0) return hash;
+      for (i = 0; i < this.length; i++) {
+        char = this.charCodeAt(i);
+        hash = (hash << 5) - hash + char;
+        hash = hash & hash; // Convert to 32bit integer
+      }
+      return hash;
+    };
 
     if (resolver) {
       resolverKey = resolver.apply(this, arguments);
       // key = resolver.apply(this, arguments);
       console.log("key from resolver: " + resolverKey);
       // console.log("resolverKey typeof: " + typeof resolverKey);
+
       if (typeof resolverKey === "string") {
         key = resolverKey;
       } else {
-        // TODO other types, or multiple parameters, for now only number
-
-        // using hashCode as in Java
-        // source: https://werxltd.com/wp/2010/05/13/javascript-implementation-of-javas-string-hashcode-method/
-
-        String.prototype.hashCode = function () {
-          var hash = 0;
-          if (this.length == 0) return hash;
-          for (i = 0; i < this.length; i++) {
-            char = this.charCodeAt(i);
-            hash = (hash << 5) - hash + char;
-            hash = hash & hash; // Convert to 32bit integer
-          }
-          return hash;
-        };
-
         let resolverKeyToString = resolverKey.toString();
         key = resolverKeyToString.hashCode();
-        console.log("hashed key: " + hashedKey);
+        console.log("hashed key: " + key);
       }
     } else {
-      // TODO use hashcode to create a key from args from passed func
-      for (let i = 0; i < arguments.length; i++) {
-        console.log("arguments " + i + ": " + arguments[i]);
-      }
+      // use the first argument of the memoized function to create a cache key
+      argForKey = arguments[0].toString();
 
-      key = null;
+      key = argForKey.hashCode();
     }
 
+    // another option to hash the key, source http://pajhome.org.uk/crypt/md5/
     // console.log("hex? " + hex_md5("hi"));
 
-    // if timeout is provided, cached item is deleted after
-    if (timeout) {
-      setTimeout(() => {
-        console.log("timeout: " + timeout);
-        console.log("deleting " + cache[key]);
-        delete cache[key];
-      }, timeout);
-    }
+    setTimeout(() => {
+      console.log("timeout: " + timeout);
+      console.log("deleting " + cache[key]);
+      delete cache[key];
+    }, timeout);
 
     if (typeof cache[key] == "undefined") {
       cache[key] = func.apply(this, arguments);
