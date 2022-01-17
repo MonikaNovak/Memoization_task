@@ -30,35 +30,54 @@
 let cache = [];
 
 function memoize(func, resolver, timeout) {
-  // TODO implement timeout
   // TODO resolver as optional argument
 
   // initialize key
   let key;
-  let testKey = resolver.apply(this, arguments);
-  console.log("test key: " + testKey);
 
   // memoized function in which we have access to the object calling passed in function to access its arguments
+  // memoize() returns a new function which wraps a caching mechanism around “func”
   memoized = function () {
     // (LEARN MORE what exactly is happening when you call function.prototype.apply() + "this")
     // TODO defining what types keys should have
 
+    // console.log("arguments1: " + args[0]);
+    // console.log("arguments2: " + args[1]);
+    // console.log("arguments3: " + args[2]);
+
     if (resolver) {
-      key = resolver.apply(this, arguments);
-      console.log("key from resolver: " + key);
+      resolverKey = resolver.apply(this, arguments);
+      // key = resolver.apply(this, arguments);
+      console.log("key from resolver: " + resolverKey);
+      if (typeof resolverKey === "string") {
+        key = resolverKey;
+      } else {
+        // for now just uses input as cache key
+        key = resolverKey;
+      }
     } else {
       // TODO use hashcode to create a key from args from passed func
       // check how is it if different function gets passed with same arguments
+      for (let i = 0; i < arguments.length; i++) {
+        console.log("arguments " + i + ": " + arguments[i]);
+      }
+
       key = null;
     }
 
-    setTimeout(() => {
-      console.log("deleting " + cache[key]);
-      delete cache[key];
-    }, timeout);
+    // console.log("hex? " + hex_md5("hi"));
+
+    // if timeout is provided, cached item is deleted after
+    if (timeout) {
+      setTimeout(() => {
+        console.log("timeout: " + timeout);
+        console.log("deleting " + cache[key]);
+        delete cache[key];
+      }, timeout);
+    }
 
     if (typeof cache[key] == "undefined") {
-      cache[key] = func.apply(this.arguments);
+      cache[key] = func.apply(this, arguments);
     }
 
     console.log("value of the key: " + cache[key]);
