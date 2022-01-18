@@ -29,53 +29,44 @@ var md5 = require("md5");
  *                  original function, the resolver function should provide the memoization key.
  */
 
-// cache for memoized functions, using array with key as index and result as value
-let cache = [];
-
 function memoize(func, timeout, resolver) {
-  // initialize key
+  // cache for memoized functions, using array with key as index and result as value
+  let cache = [];
+  // initialize cache key
   let key;
 
   // memoized function in which we have access to the object calling passed in function to access its arguments
-  // so memoize() returns a new function which wraps the caching around “func”
+  // meaning that memoize() returns a new function which wraps the caching around “func”
   let memoized = function () {
-    // TODO defining what types keys should have
-
     // determine cache key depending if resolver is provided
     if (
       resolver &&
       (typeof resolver.apply(this, arguments) === "string" || typeof resolver.apply(this, arguments) === "number")
     ) {
-      // expected that resolver provides a valid (unique) cache key that is a string or a number
+      // expected that if resolver is included, it provides some valid (unique) cache key that is a string or a number
       key = resolver.apply(this, arguments);
-      console.log("key from resolver: " + key + " type of: " + typeof key);
     } else {
-      // using the md5 package to hash the input and create a unique cahce key
+      // using the md5 package to hash the input and create a unique cache key
 
       // if following the task description, solution with using first argument of memoized function to create cache key would be:
       // key = md5(arguments[0].toString);
       // but considering that
       // 1. the argument can be any data type
-      // 2. different memoized function can have identical first arguments
+      // 2. different memoized functions can have identical first arguments
       // we can, for example, create unique string from combination of the function as a string and provided arguments and hash those:
       let stringFromFunc = func.toString() + "-" + Array.prototype.slice.call(arguments).join("-");
       key = md5(stringFromFunc);
-      console.log("string created from function: " + stringFromFunc);
-      console.log("created key: " + key);
     }
 
     // deleting result after timeout exceeds
     setTimeout(() => {
-      console.log("timeout: " + timeout);
-      console.log("deleting " + cache[key]);
       delete cache[key];
     }, timeout);
 
+    // if there is no data stored under the key, we store the result of memoized func
     if (typeof cache[key] == "undefined") {
       cache[key] = func.apply(this, arguments);
     }
-
-    console.log("stored result: " + cache[key]);
 
     return cache[key];
   };

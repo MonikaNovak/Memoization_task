@@ -46,7 +46,6 @@ describe("memoization", function () {
 
     const memoized = memoization.memoize(testFunction, 1000);
     expect(memoized("c544d3ae-a72d-4755-8ce5-d25db415b778")).to.equal(40);
-    clock.tick(5000);
   });
 
   it("should memoize different functions with the same arguments", () => {
@@ -63,13 +62,18 @@ describe("memoization", function () {
   });
 
   it("should generate cache key for different parameter types", () => {
-    let returnValue = 60;
+    let returnValue = 80;
     const testFunction1 = (key) => returnValue;
+    const objectPar = {
+      firstName: "Peter",
+      lastName: "Peterson",
+    };
 
     const memoized1 = memoization.memoize(testFunction1, 1000);
-    expect(memoized1(() => "callback return value")).to.equal(60);
-    expect(memoized1(1.2)).to.equal(60);
-    expect(memoized1("some other string")).to.equal(60);
-    expect(memoized1(true)).to.equal(60);
+    expect(memoized1(() => "callback return value")).to.equal(80);
+    expect(memoized1(objectPar)).to.equal(80);
+    expect(memoized1(1.2)).to.equal(80);
+    expect(memoized1("some other string")).to.equal(80);
+    expect(memoized1(true)).to.equal(80);
   });
 });

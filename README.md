@@ -1,6 +1,8 @@
 # Memoization
 
-A general introduction into memoization: https://en.wikipedia.org/wiki/Memoization
+A function that memoizes the result of a function and caches this result for a limited amount of time.
+The cache key is either defined by provided resolver function or created from the memoized function.
 
-See memoization.js and test.js for the required functionality. Please provide a
-design rationale documenting your decisions (in code).
+Run `npm test` to execute the unit tests via [Chai](https://github.com/chaijs/chai).
+
+A general introduction into memoization: https://en.wikipedia.org/wiki/Memoization
